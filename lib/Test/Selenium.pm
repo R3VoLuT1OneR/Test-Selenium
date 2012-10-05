@@ -4,6 +4,10 @@ use Selenium::Remote::Driver;
 with 'MooseX::Getopt';
 with 'MooseX::SimpleConfig';
 
+has '+configfile'  => (
+    documentation  => 'get config from file',
+);
+
 has remote_server_addr => (
     is             => 'ro',
     isa            => 'Str',
@@ -70,6 +74,7 @@ has proxy          => (
 has web_driver     => (
     is             => 'ro',
     isa            => 'Selenium::Remote::Driver',
+    traits         => [ 'NoGetopt' ],
     handles        => [ qw(
         get
         get_sessions
