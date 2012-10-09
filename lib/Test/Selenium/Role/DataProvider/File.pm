@@ -1,4 +1,4 @@
-package Test::Selenium::Role::DataProvider;
+package Test::Selenium::Role::DataProvider::File;
 use Moose::Role;
 use Config::Any;
 
@@ -6,7 +6,7 @@ has datafile      => (
     is            => 'ro',
     isa           => 'ArrayRef',
     required      => 1,
-    documentation => 'config file for dataprovider',
+    documentation => 'config file for dataprovider ( can be many files )',
 );
 
 has data          => (

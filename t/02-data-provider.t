@@ -8,7 +8,7 @@ use t::lib::TempFile;
     package Selenium::Test;
     use Moose;
     extends 'Test::Selenium';
-    with 'Test::Selenium::Role::DataProvider';
+    with 'Test::Selenium::Role::DataProvider::File';
 }
 
 my $datafile_yaml_1 = t::lib::TempFile->new(SUFFIX=>'.yaml')->write_to_file("test: 'yo'\n");
