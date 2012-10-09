@@ -1,66 +1,80 @@
 package Test::Selenium;
 use Moose;
-with 'MooseX::SimpleConfig';
-with 'MooseX::Getopt';
-
 use Selenium::Remote::Driver;
+with 'MooseX::Getopt';
+with 'MooseX::SimpleConfig';
+
+has '+configfile'  => (
+    documentation  => 'get config from file',
+);
 
 has remote_server_addr => (
     is             => 'ro',
     isa            => 'Str',
-    default        => 'localhost',
+    predicate      => 'has_remote_server_addr',
     documentation  => 'IP or FQDN of the RC server machine',
 );
 
 has browser_name   => (
     is             => 'ro',
     isa            => 'Str',
-    default        => 'firefox',
+    predicate      => 'has_browser_name',
+    documentation  => 'desired browser string: {iphone|firefox|internet explorer|htmlunit|iphone|chrome}',
 );
 
 has version        => (
     is             => 'ro',
     isa            => 'Str',
-    default        => '',
+    predicate      => 'has_version',
+    documentation  => 'desired browser version number',
 );
 
 has platform       => (
     is             => 'ro',
     isa            => 'Str',
-    default        => 'ANY',
+    predicate      => 'has_platform',
+    documentation  => 'desired platform: {WINDOWS|XP|VISTA|MAC|LINUX|UNIX|ANY}',
 );
 
 has javascript     => (
     is             => 'ro',
     isa            => 'Bool',
-    default        => 1,
+    predicate      => 'has_javascript',
+    documentation  => 'whether javascript should be supported',
 );
 
 has accept_ssl_certs => (
     is             => 'ro',
     isa            => 'Bool',
-    default        => 1,
+    predicate      => 'has_accept_ssl_certs',
+    documentation  => 'whether SSL certs should be accepted, default is true',
 );
 
 has auto_close     => (
     is             => 'ro',
     isa            => 'Bool',
-    default        => 1,
+    predicate      => 'has_auto_close',
+    documentation  => 'whether driver should end session on remote server on close',
 );
 
 has extra_capabilities => (
     is             => 'ro',
     isa            => 'HashRef',
+    predicate      => 'has_extra_capabilities',
+    documentation  => 'HASH of extra capabilities',
 );
 
 has proxy          => (
     is             => 'ro',
     isa            => 'HashRef',
+    predicate      => 'has_proxy',
+    documentation  => 'HASH of Selenium::Remote::Driver proxy configuration',
 );
 
 has web_driver     => (
     is             => 'ro',
     isa            => 'Selenium::Remote::Driver',
+    traits         => [ 'NoGetopt' ],
     handles        => [ qw(
         get
         get_sessions
@@ -123,41 +137,17 @@ sub _build_web_driver {
     my $self = shift;
 
     Selenium::Remote::Driver->new(
-        remote_server_addr => $self->remote_server_addr,
-        browser_name       => $self->browser_name,
-        version            => $self->version,
-        platform           => $self->platform,
-        javascript         => $self->javascript,
-        accept_ssl_certs   => $self->accept_ssl_certs,
-        auto_close         => $self->auto_close,
-        extra_capabilities => $self->extra_capabilities,
-        proxy              => $self->proxy,
+        ( $self->has_remote_server_addr ) ? ( remote_server_addr => $self->remote_server_addr ) : (),
+        ( $self->has_browser_name       ) ? ( browser_name       => $self->browser_name ) : (),
+        ( $self->has_version            ) ? ( version            => $self->version ) : (),
+        ( $self->has_platform           ) ? ( platform           => $self->platform ) : (),
+        ( $self->has_javascript         ) ? ( javascript         => $self->javascript ) : (),
+        ( $self->has_accept_ssl_certs   ) ? ( accept_ssl_certs   => $self->accept_ssl_certs ) : (),
+        ( $self->has_auto_close         ) ? ( auto_close         => $self->auto_close ) : (),
+        ( $self->has_extra_capabilities ) ? ( extra_capabilities => $self->extra_capabilities ) : (),
+        ( $self->has_proxy              ) ? ( proxy              => $self->proxy ) : (),
     );
 }
-
-=cut
-'browser_name' - <string> - desired browser string:
-{iphone|firefox|internet explorer|htmlunit|iphone|chrome}
-'version' - <string> - desired browser version number
-'platform' - <string> - desired platform:
-{WINDOWS|XP|VISTA|MAC|LINUX|UNIX|ANY}
-'javascript' - <boolean> - whether javascript should be supported
-'accept_ssl_certs' - <boolean> - whether SSL certs should be accepted, default is true.
-'auto_close' - <boolean> - whether driver should end session on remote
-server on close.
-'extra_capabilities' - HASH of extra capabilities
-'proxy' - HASH - Proxy configuration with the following keys:
-'proxyType' - <string> - REQUIRED, Possible values are:
-direct - A direct connection - no proxy in use,
-manual - Manual proxy settings configured, e.g. setting a proxy for HTTP, a proxy for FTP, etc,
-pac - Proxy autoconfiguration from a URL,
-autodetect - proxy autodetection, probably with WPAD,
-system - Use system settings
-'proxyAutoconfigUrl' - <string> - REQUIRED if proxyType is 'pac', ignored otherwise. Expected format: http://hostname.com:1234/pacfile.
-'ftpProxy' - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
-'httpProxy' - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
-'sslProxy' - <string> - OPTIONAL, ignored if proxyType is not 'manual'. Expected format: hostname.com:1234
-=cut
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
